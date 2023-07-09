@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable, Req } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AuthDTO } from './dto';
 import { JwtService } from '@nestjs/jwt';
+import * as argon2 from 'argon2';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable({}) //this is "Dependency Injection"
@@ -81,25 +82,55 @@ export class AuthService {
     //call api login and send a Jwt token
     const user = {
       id: 1,
-      email: 'abc@gmail.com',
+      email: authDTO.email,
     };
+
+    // const tokens = await this.signJwtToken(user.id, user.email);
+    // await this.updateRefreshToken(user.id, tokens.refreshToken);
     return await this.signJwtToken(user.id, user.email);
   }
+
+  /**Logout will clear exprie token and renew a token then send to client */
+  async logout(token: string): Promise<{ accessToken: string }> {
+    //update refreshToken = nil on DB
+
+    //Return '' for client
+    return {
+      accessToken: '',
+    };
+  }
+
   //now convert to an object, not string
   async signJwtToken(
     userId: number,
     email: string,
-  ): Promise<{ accessToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload = {
       sub: userId,
       email,
     };
-    const jwtString = await this.jwtService.signAsync(payload, {
+    const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: '30m',
-      secret: this.configService.get('JWT_SECRET'),
+      secret: this.configService.get('JWT_ACCESS_SECRET'),
+    });
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      expiresIn: '7d',
+      secret: this.configService.get('JWT_REFRESS_SECRET'),
     });
     return {
-      accessToken: jwtString,
+      accessToken,
+      refreshToken,
     };
+  }
+
+  hashData(data: string) {
+    return argon2.hash(data);
+  }
+
+  async updateRefreshToken(userId: number, refreshToken: string) {
+    const hashedRefreshToken = await this.hashData(refreshToken);
+    // await this.usersService.update(userId, {
+    //   refreshToken: hashedRefreshToken,
+    // });
   }
 }
