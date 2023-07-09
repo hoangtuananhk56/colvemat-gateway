@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
+import { ConfigModule } from '@nestjs/config';
 // import { UserService } from './user/user.service';
 
 @Module({
@@ -11,6 +12,7 @@ import { UserModule } from './user/user.module';
     //   type: 'sqlite',
     //   data: 'db.sqlite',
     // }),
+    ConfigModule.forRoot(),
     UserModule,
   ],
   controllers: [AppController],

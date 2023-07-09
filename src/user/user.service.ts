@@ -3,7 +3,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Observable, catchError, map } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
-import { Email, ResponseGenerator } from './entities/email.entity';
+import { ConfigGetOptions, ConfigService } from '@nestjs/config';
+import { Email } from './entities/email.entity';
 
 @Injectable()
 export class UserService {
