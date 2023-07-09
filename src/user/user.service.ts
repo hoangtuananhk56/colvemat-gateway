@@ -1,9 +1,8 @@
+import { HttpService } from '@nestjs/axios';
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Observable, catchError, map } from 'rxjs';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Observable, catchError, map } from 'rxjs';
-import { HttpService } from '@nestjs/axios';
-import { ConfigGetOptions, ConfigService } from '@nestjs/config';
 import { Email } from './entities/email.entity';
 
 @Injectable()

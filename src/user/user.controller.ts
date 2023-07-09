@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseFilters,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,11 +19,20 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { HttpExceptionFilter } from 'src/http-exception/filter';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 
 @Controller('api/v2/user')
 @UseFilters(new HttpExceptionFilter())
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('me')
+  me(@Req() resquest: Request) {
+    console.log(JSON.stringify(Object.keys(resquest)));
+    return 'Hello world';
+  }
 
   @Post()
   @ApiOkResponse({ description: 'Post updated successfully.' })
